@@ -1,31 +1,76 @@
 import os
 
-from pyspark.sql.types import StructType, StructField, StringType, BooleanType, IntegerType, ShortType, LongType
+from pyspark.sql import Window
+from pyspark.sql.types import StructType, StructField, StringType, BooleanType, IntegerType, ShortType, LongType, \
+    FloatType
+from pyspark.sql.functions import udf, split, regexp_replace, array_distinct, first, last
 
-from src.utils.local import get_spark_session
+from src.utils.local.spark_session import get_spark_session
+from src.utils.local.parse_dimension import parse_dimensions
 
 
 def aggregation_transformations(df):
-    pass
+    return None
 
 
-def process_constituent_id_column(df):
-    pass
+def back_fill(df):
+    window = Window.partitionBy('Title').rowsBetween(Window.unboundedPreceding, Window.currentRow)
+    df_back_filled = df.withColumn('Constituent ID', first(col='Constituent ID', ignorenulls=True).over(window))
+    return df_back_filled
+
+
+def forward_fill(df):
+    window = Window.partitionBy('Title').rowsBetween(Window.currentRow, Window.unboundedFollowing)
+    df_forward_filled = df.withColumn('Constituent ID', last(col='Constituent ID', ignorenulls=True).over(window))
+    return df_forward_filled
+
+
+def b_fill_and_f_fill_constituent_id_column(df):
+    df_back_filled = back_fill(df)
+    result_df = forward_fill(df_back_filled)
+    return result_df
 
 
 def process_country_column(df):
-    pass
+    df_country_replaced = (df
+                           .withColumn('Country_replaced',
+                                       regexp_replace(string='Country',
+                                                      pattern=r"(\||\s+or\s+)",
+                                                      replacement=', '
+                                                      )
+                                       )
+                           .drop('Country'))
+
+    df_country_split = (df_country_replaced
+                        .withColumn('Country_split', split(str='Country_replaced',
+                                                           pattern=', '))
+                        .drop('Country_replaced'))
+    result_df = df_country_split.withColumn('Country', array_distinct(df_country_split['Country_split']))
+    return result_df
+
+
+def get_dimensions_schema():
+    return StructType([
+        StructField(name="Height", dataType=FloatType(), nullable=True),
+        StructField(name="Width", dataType=FloatType(), nullable=True),
+        StructField(name="Length", dataType=FloatType(), nullable=True),
+        StructField(name="Diameter", dataType=FloatType(), nullable=True),
+        StructField(name="Unit", dataType=StringType(), nullable=True)
+    ])
 
 
 def process_dimension_column(df):
-    # show the first 100 records
-    df.select('Dimensions').show(100, truncate=False)
+    parse_dimensions_udf = udf(parse_dimensions, get_dimensions_schema())
+    df_with_dimensions_parsed = df.withColumn('Dimensions', parse_dimensions_udf(df['Dimensions']))
+    result_df = df_with_dimensions_parsed.select('*', 'Dimensions.*')
+    return result_df
 
 
 def pre_processing_transformations(df):
-    process_dimension_column(df)
-    process_country_column(df)
-    process_constituent_id_column(df)
+    dim_processed_df = process_dimension_column(df)
+    dim_and_country_processed_df = process_country_column(dim_processed_df)
+    result_df = b_fill_and_f_fill_constituent_id_column(dim_and_country_processed_df)
+    return result_df
 
 
 def get_data_dir(base_dir):
@@ -125,8 +170,8 @@ def main(spark):
     else:
         met_objects_df = met_objects_raw_df
 
-    pre_processing_transformations(df=met_objects_df)
-    aggregation_transformations(df=met_objects_df)
+    met_objects_pre_processed_df = pre_processing_transformations(df=met_objects_df)
+    met_objects_aggregated_df = aggregation_transformations(df=met_objects_pre_processed_df)
 
 
 if __name__ == "__main__":
