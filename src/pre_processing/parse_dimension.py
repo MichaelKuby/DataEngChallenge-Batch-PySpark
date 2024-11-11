@@ -120,6 +120,9 @@ def parse_pattern_c(dim_str):
 
 
 def parse_dimensions(dim_str):
+    if dim_str is None:
+        return {'Height': None, 'Width': None, 'Length': None, 'Diameter': None, 'Unit': None}
+
     dim_str = dim_str.strip()
 
     # Determine pattern
