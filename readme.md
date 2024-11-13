@@ -48,7 +48,7 @@ at: [Met Open Access Data](https://github.com/metmuseum/openaccess/)
 
 4. Run the main batch processing script:
     ```bash
-    python src/batch_pipeline.py
+    python -m src.batch_pipeline
     ```
 
 ## Batch Processing
@@ -88,17 +88,20 @@ Aggregates the data to generate:
 
 ### Storage Format
 
-The resulting tables are stored in CSV format. This choice is based on the small size of the individual tables and the
-simplicity and portability of the CSV format. CSV is human-readable, easy to share, and works well for lightweight data
-processing. However, for larger datasets, more advanced storage formats like Parquet or a relational database would be
-considered to enhance performance and schema enforcement.
+The resulting tables are stored in Parquet format. This choice is based on Parquet’s ability to efficiently store data
+in a columnar format, providing better compression and faster read times compared to CSV, especially for analytical
+workloads. Parquet supports schema enforcement, making it a robust choice for data consistency and complex data
+structures, such as nested fields and arrays. This format is optimized for distributed data processing systems like
+Apache Spark, providing significant performance advantages over row-based formats like CSV.
 
 ### Optimization Approaches
 
 If the data volume increases significantly, the following optimizations would be considered:
 
-- **Partitioning**: Increase parallelism by re-partitioning data during transformations and reads.
+- **Partitioning**: Increase parallelism by partitioning the data based on relevant columns during transformations and
+  reads, which can improve query performance.
 - **Caching Intermediate Results**: Cache frequently used DataFrames to reduce re-computation overhead.
-- **Efficient Data Formats**: Switch to more optimized formats like Parquet or ORC.
+- **Efficient Data Formats**: Continue to leverage optimized formats like Parquet or explore alternatives such as ORC
+  for improved compression and query performance based on the use case.
 - **Distributed Processing**: Leverage Spark's distributed processing capabilities for better scalability.
 - **Pipeline Parallelization**: Break down the pipeline into smaller, independent tasks for parallel execution.

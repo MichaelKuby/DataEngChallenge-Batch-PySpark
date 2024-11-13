@@ -1,6 +1,6 @@
-from src.aggregations.agg_functions import get_artworks_per_country, get_number_of_artists_per_country, \
+from .agg_functions import get_artworks_per_country, get_number_of_artists_per_country, \
     get_avg_h_w_l_per_country, unique_list_of_constituent_ids_per_country
-from src.aggregations.agg_helpers import filter_for_valid_countries
+from .agg_helpers import filter_for_valid_countries
 
 
 def aggregation_transformations(df, spark):

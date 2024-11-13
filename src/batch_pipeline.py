@@ -1,7 +1,6 @@
 from src.aggregations.agg_orchestrator import aggregation_transformations
 from src.pre_processing.pre_orchestrator import pre_processing_transformations
-from src.utils.batch_pipeline_helpers import write_dataframes_to_parquet, print_each_dataframe, read_source_data, \
-    get_directories, check_for_corrupt_records
+from src.utils.batch_pipeline_helpers import write_dataframes_to_file, print_each_dataframe, read_source_data, get_directories, check_for_corrupt_records
 from src.utils.spark_session import get_spark_session
 
 
@@ -20,7 +19,7 @@ def main(spark):
     # Write the aggregated dataframes to parquet
     aggregated_dfs_names = ['individual_artworks_per_country', 'number_of_artists_per_country',
                             'avg_h_w_l_per_country', 'constituent_ids_per_country']
-    write_dataframes_to_parquet(dataframes=aggregated_dfs, output_dir=output_dir, names=aggregated_dfs_names)
+    write_dataframes_to_file(dataframes=aggregated_dfs, output_dir=output_dir, names=aggregated_dfs_names)
 
     # Print the aggregated dataframes
     print_each_dataframe(aggregated_dfs_names, output_dir, spark)
