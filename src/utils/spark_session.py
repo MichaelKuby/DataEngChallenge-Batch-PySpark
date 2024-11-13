@@ -9,7 +9,7 @@ def get_spark_session(app_name='DataEngChallenge-Batch-PySpark'):
         spark_session = SparkSession.builder \
             .appName(app_name) \
             .config("spark.log.level", "ERROR") \
-            .config("spark.driver.memory", "16g") \
+            .config("spark.driver.memory", "4g") \
             .master("local[*]") \
             .getOrCreate()
     return spark_session

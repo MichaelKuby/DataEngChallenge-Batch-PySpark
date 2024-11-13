@@ -1,7 +1,7 @@
 import unittest
 from pyspark.sql import SparkSession, Row
 
-from src.aggregations.aggregation_functions import get_number_of_artists_per_country
+from src.aggregations.agg_functions import get_number_of_artists_per_country
 
 
 class TestGetArtistsPerCountry(unittest.TestCase):

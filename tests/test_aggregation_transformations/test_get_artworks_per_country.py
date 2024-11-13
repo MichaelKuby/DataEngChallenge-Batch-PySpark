@@ -2,7 +2,7 @@ import unittest
 from pyspark.sql import SparkSession
 from pyspark.sql import Row
 
-from src.aggregations.aggregation_functions import get_artworks_per_country
+from src.aggregations.agg_functions import get_artworks_per_country
 
 
 class TestGetArtworksPerCountry(unittest.TestCase):

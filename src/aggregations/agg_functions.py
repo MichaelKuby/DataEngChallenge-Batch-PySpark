@@ -3,11 +3,11 @@ from pyspark.sql import functions as F
 
 def get_artworks_per_country(df):
     country_count_df = df.groupBy('Country').count()
-
     return country_count_df
 
 
 def get_number_of_artists_per_country(df):
+    df = df.where(F.col('Constituent ID').isNotNull())
     country_artist_count_df = df.groupBy('Country').agg(F.countDistinct('Constituent ID').alias('Number Of Artists'))
     return country_artist_count_df
 

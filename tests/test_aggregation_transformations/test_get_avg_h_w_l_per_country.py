@@ -1,6 +1,6 @@
 import unittest
 from pyspark.sql import SparkSession, Row
-from src.aggregations.aggregation_functions import get_avg_h_w_l_per_country
+from src.aggregations.agg_functions import get_avg_h_w_l_per_country
 
 
 class TestGetAvgHWLPerCountry(unittest.TestCase):

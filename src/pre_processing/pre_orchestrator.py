@@ -1,8 +1,8 @@
 from pyspark.sql.functions import udf
 
-from src.pre_processing.fill_operations import b_fill_and_f_fill_constituent_id_column
-from src.pre_processing.parse_dimension import parse_dimensions
-from src.pre_processing.process_country_column import process_country_column
+from src.pre_processing.fill_functions import b_fill_and_f_fill_constituent_id_column
+from src.pre_processing.parse_dimension_functions import parse_dimensions
+from src.pre_processing.process_country_column_functions import process_country_column
 from src.utils.schema import get_dimensions_schema
 
 

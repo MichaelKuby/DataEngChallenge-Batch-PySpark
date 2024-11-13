@@ -2,7 +2,7 @@ import unittest
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType, ArrayType
 from pyspark.sql import Row
-from src.pre_processing.process_country_column import process_country_column
+from src.pre_processing.process_country_column_functions import process_country_column
 
 class TestProcessCountryColumn(unittest.TestCase):
 

@@ -1,44 +1,31 @@
 import os
 
-from src.aggregations.orchestrator import aggregation_transformations
-from src.pre_processing.orchestrator import pre_processing_transformations
-from src.utils.batch_pipeline_helpers import get_data_dir, write_corrupt_records_for_future_processing, \
-    write_dataframes_to_parquet
-from src.utils.schema import get_met_objects_schema
+from src.aggregations.agg_orchestrator import aggregation_transformations
+from src.pre_processing.pre_orchestrator import pre_processing_transformations
+from src.utils.batch_pipeline_helpers import write_dataframes_to_csv, print_each_dataframe, read_source_data, \
+    get_directories, check_for_corrupt_records
 from src.utils.spark_session import get_spark_session
 
 
 def main(spark):
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    data_dir = get_data_dir(base_dir=base_dir)
-    output_dir = os.path.join(data_dir, 'output')
-    corrupt_records_dir = os.path.join(data_dir, 'corrupt_records')
-    met_objects_filename = os.path.join(data_dir, 'MetObjects.csv')
+    # Get the directories
+    data_dir, input_dir, output_dir, corrupt_records_dir, met_objects_filename = get_directories()
 
-    # Use permissive mode to handle corrupt records. columnNameOfCorruptRecord is used to store corrupt records.
-    met_objects_raw_df = spark.read \
-        .format("csv") \
-        .option("header", "true") \
-        .option("mode", "permissive") \
-        .option("columnNameOfCorruptRecord", "corrupt_record") \
-        .schema(get_met_objects_schema()) \
-        .load(met_objects_filename)
+    # Read the source data and check for corrupt records
+    met_objects_raw_df = read_source_data(met_objects_filename, spark)
+    met_objects_df = check_for_corrupt_records(corrupt_records_dir, met_objects_raw_df)
 
-    # Check if there are corrupt records in the dataset. If so, filter them out and write them to a separate file.
-    if 'corrupt_record' in met_objects_raw_df.columns:
-        met_objects_df = met_objects_raw_df.filter(met_objects_raw_df['corrupt_record'].isNull())
-        corrupt_records = met_objects_raw_df.filter(met_objects_raw_df['corrupt_record'].isNotNull())
-        write_corrupt_records_for_future_processing(corrupt_records, corrupt_records_dir)
-    else:
-        met_objects_df = met_objects_raw_df
-
+    # Perform the pre-processing and aggregation transformations
     met_objects_pre_processed_df = pre_processing_transformations(df=met_objects_df)
     aggregated_dfs = aggregation_transformations(df=met_objects_pre_processed_df, spark=spark)
 
+    # Write the aggregated dataframes to parquet
     aggregated_dfs_names = ['individual_artworks_per_country', 'number_of_artists_per_country',
                             'avg_h_w_l_per_country', 'constituent_ids_per_country']
+    write_dataframes_to_csv(dataframes=aggregated_dfs, output_dir=output_dir, names=aggregated_dfs_names)
 
-    write_dataframes_to_parquet(dataframes=aggregated_dfs, output_dir=output_dir, names=aggregated_dfs_names)
+    # Print the aggregated dataframes
+    print_each_dataframe(aggregated_dfs_names, output_dir, spark)
 
     spark.stop()
 

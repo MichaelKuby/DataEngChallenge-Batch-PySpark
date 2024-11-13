@@ -1,6 +1,6 @@
 import unittest
 
-from src.pre_processing.parse_dimension import parse_dimensions
+from src.pre_processing.parse_dimension_functions import parse_dimensions
 
 
 class TestParseDimension(unittest.TestCase):
