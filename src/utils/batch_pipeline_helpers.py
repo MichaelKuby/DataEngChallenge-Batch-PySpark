@@ -5,22 +5,15 @@ from src.utils.schema import get_met_objects_schema
 
 def print_each_dataframe(aggregated_dfs_names, output_dir, spark):
     for name in aggregated_dfs_names:
-        df = spark.read \
-            .format("csv") \
-            .option("header", "true") \
-            .load(f"{output_dir}/{name}.csv")
+        df = spark.read.parquet(f"{output_dir}/{name}.parquet")
         print(f"First 30 rows of {name}:")
         df.show(30)
 
 
-def write_dataframes_to_csv(dataframes, output_dir, names):
+def write_dataframes_to_parquet(dataframes, output_dir, names):
     for dataframe, name in zip(dataframes, names):
-        output_path = f"{output_dir}/{name}.csv"
-        dataframe.write \
-            .format("csv") \
-            .option("header", "true") \
-            .mode("overwrite") \
-            .save(output_path)
+        output_path = f"{output_dir}/{name}.parquet"
+        dataframe.write.parquet(output_path, mode="overwrite")
 
 
 def get_data_dir(base_dir):
