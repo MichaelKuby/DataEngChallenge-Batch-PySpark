@@ -8,8 +8,10 @@ from ..utils.schema import get_dimensions_schema
 
 def process_dimension_column(df):
     parse_dimensions_udf = udf(parse_dimensions, get_dimensions_schema())
-    df_with_dimensions_parsed = df.withColumn('Dimensions', parse_dimensions_udf(df['Dimensions']))
-    result_df = df_with_dimensions_parsed.select('*', 'Dimensions.*')
+    df_with_dimensions_parsed = df.withColumn(
+        "Dimensions", parse_dimensions_udf(df["Dimensions"])
+    )
+    result_df = df_with_dimensions_parsed.select("*", "Dimensions.*")
     return result_df
 
 

@@ -9,10 +9,11 @@ class TestGetArtistsPerCountry(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Initialize a SparkSession
-        cls.spark = SparkSession.builder \
-            .appName("TestGetArtistsPerCountry") \
-            .master("local[2]") \
+        cls.spark = (
+            SparkSession.builder.appName("TestGetArtistsPerCountry")
+            .master("local[2]")
             .getOrCreate()
+        )
 
     @classmethod
     def tearDownClass(cls):
@@ -22,14 +23,14 @@ class TestGetArtistsPerCountry(unittest.TestCase):
     def test_get_artists_per_country(self):
         # Create a sample DataFrame
         data = [
-            Row(Country='USA', **{'Constituent ID': 1}),
-            Row(Country='USA', **{'Constituent ID': 2}),
-            Row(Country='USA', **{'Constituent ID': 1}),  # Duplicate artist
-            Row(Country='France', **{'Constituent ID': 3}),
-            Row(Country='France', **{'Constituent ID': 4}),
-            Row(Country='France', **{'Constituent ID': 3}),  # Duplicate artist
-            Row(Country='Germany', **{'Constituent ID': 5}),
-            Row(Country='Germany', **{'Constituent ID': 5}),  # Duplicate artist
+            Row(Country="USA", **{"Constituent ID": 1}),
+            Row(Country="USA", **{"Constituent ID": 2}),
+            Row(Country="USA", **{"Constituent ID": 1}),  # Duplicate artist
+            Row(Country="France", **{"Constituent ID": 3}),
+            Row(Country="France", **{"Constituent ID": 4}),
+            Row(Country="France", **{"Constituent ID": 3}),  # Duplicate artist
+            Row(Country="Germany", **{"Constituent ID": 5}),
+            Row(Country="Germany", **{"Constituent ID": 5}),  # Duplicate artist
         ]
         df = self.spark.createDataFrame(data)
 
@@ -38,18 +39,18 @@ class TestGetArtistsPerCountry(unittest.TestCase):
 
         # Expected DataFrame
         expected_data = [
-            Row(Country='USA', **{'Number Of Artists': 2}),
-            Row(Country='France', **{'Number Of Artists': 2}),
-            Row(Country='Germany', **{'Number Of Artists': 1}),
+            Row(Country="USA", **{"Number Of Artists": 2}),
+            Row(Country="France", **{"Number Of Artists": 2}),
+            Row(Country="Germany", **{"Number Of Artists": 1}),
         ]
         expected_df = self.spark.createDataFrame(expected_data)
 
         # Convert DataFrames to Dictionaries for easy comparison
         result_dict = {
-            row['Country']: row['Number Of Artists'] for row in result_df.collect()
+            row["Country"]: row["Number Of Artists"] for row in result_df.collect()
         }
         expected_dict = {
-            row['Country']: row['Number Of Artists'] for row in expected_df.collect()
+            row["Country"]: row["Number Of Artists"] for row in expected_df.collect()
         }
 
         # Assert that the result matches the expected output
@@ -58,15 +59,15 @@ class TestGetArtistsPerCountry(unittest.TestCase):
     def test_get_artists_per_country_with_nulls(self):
         # Create a sample DataFrame with null Constituent IDs
         data = [
-            Row(Country='USA', **{'Constituent ID': 1}),
-            Row(Country='USA', **{'Constituent ID': 2}),
-            Row(Country='USA', **{'Constituent ID': None}),  # Null Constituent ID
-            Row(Country='USA', **{'Constituent ID': 2}),  # Duplicate artist
-            Row(Country='France', **{'Constituent ID': 3}),
-            Row(Country='France', **{'Constituent ID': None}),  # Null Constituent ID
-            Row(Country='France', **{'Constituent ID': 3}),  # Duplicate artist
-            Row(Country='Germany', **{'Constituent ID': None}),  # Null Constituent ID
-            Row(Country='Germany', **{'Constituent ID': 5}),
+            Row(Country="USA", **{"Constituent ID": 1}),
+            Row(Country="USA", **{"Constituent ID": 2}),
+            Row(Country="USA", **{"Constituent ID": None}),  # Null Constituent ID
+            Row(Country="USA", **{"Constituent ID": 2}),  # Duplicate artist
+            Row(Country="France", **{"Constituent ID": 3}),
+            Row(Country="France", **{"Constituent ID": None}),  # Null Constituent ID
+            Row(Country="France", **{"Constituent ID": 3}),  # Duplicate artist
+            Row(Country="Germany", **{"Constituent ID": None}),  # Null Constituent ID
+            Row(Country="Germany", **{"Constituent ID": 5}),
         ]
         df = self.spark.createDataFrame(data)
 
@@ -75,18 +76,18 @@ class TestGetArtistsPerCountry(unittest.TestCase):
 
         # Expected DataFrame
         expected_data = [
-            Row(Country='USA', **{'Number Of Artists': 2}),
-            Row(Country='France', **{'Number Of Artists': 1}),
-            Row(Country='Germany', **{'Number Of Artists': 1}),
+            Row(Country="USA", **{"Number Of Artists": 2}),
+            Row(Country="France", **{"Number Of Artists": 1}),
+            Row(Country="Germany", **{"Number Of Artists": 1}),
         ]
         expected_df = self.spark.createDataFrame(expected_data)
 
         # Convert DataFrames to Dictionaries for easy comparison
         result_dict = {
-            row['Country']: row['Number Of Artists'] for row in result_df.collect()
+            row["Country"]: row["Number Of Artists"] for row in result_df.collect()
         }
         expected_dict = {
-            row['Country']: row['Number Of Artists'] for row in expected_df.collect()
+            row["Country"]: row["Number Of Artists"] for row in expected_df.collect()
         }
 
         # Assert that the result matches the expected output

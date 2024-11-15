@@ -1,15 +1,24 @@
 from pyspark.sql import Window
 from pyspark.sql.functions import first, last
 
+
 def back_fill(df):
-    window = Window.partitionBy('Title').rowsBetween(Window.unboundedPreceding, Window.currentRow)
-    df_back_filled = df.withColumn('Constituent ID', first(col='Constituent ID', ignorenulls=True).over(window))
+    window = Window.partitionBy("Title").rowsBetween(
+        Window.unboundedPreceding, Window.currentRow
+    )
+    df_back_filled = df.withColumn(
+        "Constituent ID", first(col="Constituent ID", ignorenulls=True).over(window)
+    )
     return df_back_filled
 
 
 def forward_fill(df):
-    window = Window.partitionBy('Title').rowsBetween(Window.currentRow, Window.unboundedFollowing)
-    df_forward_filled = df.withColumn('Constituent ID', last(col='Constituent ID', ignorenulls=True).over(window))
+    window = Window.partitionBy("Title").rowsBetween(
+        Window.currentRow, Window.unboundedFollowing
+    )
+    df_forward_filled = df.withColumn(
+        "Constituent ID", last(col="Constituent ID", ignorenulls=True).over(window)
+    )
     return df_forward_filled
 
 
