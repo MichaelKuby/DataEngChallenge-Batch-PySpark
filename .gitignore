@@ -3,3 +3,4 @@ venv/
 .idea/
 *.xml
 /data/output/
+/data/input/MetObjects.csv
