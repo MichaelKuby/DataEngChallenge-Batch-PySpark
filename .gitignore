@@ -4,3 +4,4 @@ venv/
 *.xml
 /data/output/
 /data/input/MetObjects.csv
+.DS_Store
