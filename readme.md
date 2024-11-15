@@ -139,3 +139,39 @@ black .
 
 This will automatically format all .py files according to black’s style rules. It is recommended to run this command
 before pushing code to ensure consistency and adherence to project coding standards.
+
+## CI/CD Configuration
+
+This project leverages two primary Continuous Integration (CI) pipeline configurations for automated testing, formatting
+checks, and dependency management:
+
+1. Azure Pipelines (azure-pipelines.yml)
+
+The azure-pipelines.yml file, located in the root of this repository, is used to configure the CI pipeline in Azure
+DevOps. It defines the steps required to build, test, and validate changes pushed to the repository.
+
+Key steps in the Azure Pipelines configuration include:
+
+- Triggering Mechanism: The pipeline triggers on changes to specific branches (e.g., dev, prod).
+- Environment Setup: The pipeline uses the ubuntu-latest VM image and sets up the Python environment.
+- Dependency Installation: The pipeline installs all dependencies listed in requirements.txt.
+- Code Formatting Check: The pipeline runs black to check for code formatting issues.
+- Unit Tests: The pipeline runs unit tests using pytest to validate the functionality of the codebase.
+
+2. GitHub Actions Workflow (.github/workflows/ci.yml)
+
+The .github/workflows/ci.yml file configures a GitHub Actions workflow for CI tasks whenever changes are pushed or a
+pull request is created for the main branch.
+
+Key steps in the GitHub Actions workflow include:
+
+- Triggering Mechanism: The workflow triggers on push and pull_request events for the main branch.
+- Repository Checkout: The workflow uses actions/checkout to fetch the repository contents.
+- Python Environment Setup: The workflow uses actions/setup-python to set up Python 3.9.
+- Dependency Installation: All required dependencies are installed using pip based on requirements.txt.
+- Code Formatting Check: black --check . is run to ensure code adheres to formatting standards.
+- Unit Tests: pytest is run to execute unit tests located in the tests/ directory.
+
+These CI configurations ensure code consistency, enforce coding standards, and verify code changes through automated
+testing, providing a robust development and collaboration environment and were done as part of the Data Engineering
+Challenge for KI performance GmbH.
